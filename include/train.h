@@ -1,71 +1,44 @@
 // Copyright 2021 NNTU-CS
 #include "train.h"
-
-Train::Train() {
-  first = nullptr;
-  last = nullptr;
-  countOp = 0;
-
-  dlina = 0;
-  var_a = 0;
-}
-
+Train::Train() : countOp(0), first(nullptr) {}
 void Train::addCage(bool light) {
-  if (!(first)) {
-    Cage* NewCage = new Cage;
-    NewCage->light = light;
-   
-    NewCage->next = NewCage->previous = nullptr;
-    first = NewCage;
-    last = first;
-  } else {
-    Cage* NewCage = new Cage;
-    NewCage->light = light;
-
-    NewCage->next = NewCage->previous = nullptr;
-    last->next = NewCage;
-    last->next->previous = last;
-    last = last->next;
-    if (!last->next) {
-      last->next = first;
-    } else {
-      first->previous = last;
+    Cage* cage = new Cage;
+    cage->light = light;
+    if (!first) {
+        cage->next = cage;
+        cage->prev = cage;
+        first = cage;
+        return;
     }
-  }
+    cage->next = first->next;
+    cage->prev = first;
+    first->next->prev = cage;
+    first->next = cage;
 }
 int Train::getLength() {
-  int tempp;
-  first->light = true;
-  last = first;
-  while (true) {
-
-    countOp++;
-    var_a++;
-    last = last->next;
-    if (last->light) {
-      tempp = var_a;
-      last->light = false;
-      if ((last->previous) != nullptr) {
-        while (last->light == false) {
-          last = last->previous;
-
-          var_a--;
-          countOp++;
+    int trainLenght = 0;
+    int lenght = 0;
+    countOp = 0;
+    Cage* current = first;
+    first->light = true;
+    while (true) {
+        lenght++;
+        countOp++;
+        current = current->next;
+        if (current->light) {
+            current->light = false;
+            trainLenght = lenght;
+            for (trainLenght; trainLenght > 0; --trainLenght) {
+                current = current->prev;
+                countOp++;
+            }
+            if (!(current->light)) {
+                return lenght;
+            }
+            lenght = trainLenght;
         }
-      }
-      if (!last->light) {
-
-        dlina = tempp;
-        break;
-      }
     }
-  }
-
-  countOp += dlina;
-  return dlina;
 }
-
-
 int Train::getOpCount() {
-  return countOp;
+    return countOp;
 }
